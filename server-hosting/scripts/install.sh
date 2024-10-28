@@ -193,7 +193,7 @@ cat <<EOF | sudo -u "$FACTORIO_USER" tee "$SERVER_MODS_FILE" > /dev/null
 EOF
 echo "Server mod file created."
 
-su - ubuntu -c "/usr/local/bin/aws s3 sync s3://$S3_SAVE_BUCKET /opt/factorio/saves"
+su - ubuntu -c "/usr/local/bin/aws s3 cp s3://$S3_SAVE_BUCKET /opt/factorio/saves --recursive"
 su - ubuntu -c " (crontab -l 2>/dev/null; echo \"*/5 * * * * /usr/local/bin/aws s3 sync /opt/factorio/saves s3://$S3_SAVE_BUCKET\") | crontab -"
 
 else
