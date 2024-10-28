@@ -144,7 +144,7 @@ export class ServerHostingStack extends Stack {
     server.userData.addCommands(`\
       sed -i 's/\r$//' ${startupScriptLocalPath}; \
       chmod +x ${startupScriptLocalPath}; \
-      sudo ${startupScriptLocalPath} ${savesBucket.bucketName}\
+      sudo ${startupScriptLocalPath} ${savesBucket.bucketName} ${Config.factorioUsername} ${Config.factorioAuthToken}\
     `);
 
     //////////////////////////////

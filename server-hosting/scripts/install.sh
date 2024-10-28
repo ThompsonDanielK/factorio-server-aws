@@ -1,6 +1,8 @@
 #!/bin/bash
 
 S3_SAVE_BUCKET=$1
+FACTORIO_USERNAME=$2
+FACTORIO_AUTH_TOKEN=$3
 
 # Set the target directory
 TARGET_DIR="/opt"
@@ -115,11 +117,11 @@ cat <<EOF | sudo -u "$FACTORIO_USER" tee "$SERVER_SETTINGS_FILE" > /dev/null
     },
 
     "_comment_credentials": "Your factorio.com login credentials. Required for games with visibility public",
-    "username": "kritterdoggo",
+    "username": "$FACTORIO_USERNAME",
     "password": "",
 
     "_comment_token": "Authentication token. May be used instead of 'password' above.",
-    "token": "2b2dde653763faaaa144b956ea62f6",
+    "token": "$FACTORIO_AUTH_TOKEN",
 
     "game_password": "I<3Dan",
 
@@ -193,8 +195,20 @@ cat <<EOF | sudo -u "$FACTORIO_USER" tee "$SERVER_MODS_FILE" > /dev/null
 EOF
 echo "Server mod file created."
 
-su - ubuntu -c "/usr/local/bin/aws s3 cp s3://$S3_SAVE_BUCKET /opt/factorio/saves --recursive"
-su - ubuntu -c " (crontab -l 2>/dev/null; echo \"*/5 * * * * /usr/local/bin/aws s3 sync /opt/factorio/saves s3://$S3_SAVE_BUCKET\") | crontab -"
+# Check if there are any files in the S3 bucket
+if sudo -u $FACTORIO_USER /usr/local/bin/aws s3 ls s3://$S3_SAVE_BUCKET/ | grep -q '.'
+then
+    # Only delete local files if S3 bucket is not empty
+    sudo -u $FACTORIO_USER rm -rf /opt/factorio/saves/*
+
+    # Copy files from S3 to the local saves directory
+    sudo -u $FACTORIO_USER /usr/local/bin/aws s3 cp s3://$S3_SAVE_BUCKET /opt/factorio/saves --recursive
+else
+    echo "No files found in S3 bucket. Skipping local deletion and sync."
+fi
+
+# Set up a cron job to sync files to S3 every 5 minutes
+sudo -u $FACTORIO_USER bash -c '(crontab -l 2>/dev/null; echo "*/5 * * * * /usr/local/bin/aws s3 sync /opt/factorio/saves s3://$S3_SAVE_BUCKET --exclude \"server-save.zip\"") | crontab -'
 
 else
     echo "Factorio already installed. Skipping installation step."

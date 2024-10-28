@@ -20,4 +20,8 @@ export const Config = {
   subnetId: "",
   // Needed if subnetId is specified (i.e. us-west-2a)
   availabilityZone: "",
+
+  //Needed for public games
+  factorioUsername: "",
+  factorioAuthToken: "",
 };
