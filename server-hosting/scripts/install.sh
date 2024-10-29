@@ -178,17 +178,17 @@ cat <<EOF | sudo -u "$FACTORIO_USER" tee "$SERVER_MODS_FILE" > /dev/null
 
     {
       "name": "elevated-rails",
-      "enabled": false
+      "enabled": true
     },
 
     {
       "name": "quality",
-      "enabled": false
+      "enabled": true
     },
 
     {
       "name": "space-age",
-      "enabled": false
+      "enabled": true
     }
   ]
 }
