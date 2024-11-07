@@ -208,7 +208,7 @@ else
 fi
 
 # Set up a cron job to sync files to S3 every 5 minutes
-sudo -u $FACTORIO_USER bash -c '(crontab -l 2>/dev/null; echo "*/5 * * * * /usr/local/bin/aws s3 sync /opt/factorio/saves s3://$S3_SAVE_BUCKET --exclude \"server-save.zip\"") | crontab -'
+sudo -u "$FACTORIO_USER" bash -c "(crontab -l 2>/dev/null; echo '*/5 * * * * /usr/local/bin/aws s3 sync /opt/factorio/saves s3://$S3_SAVE_BUCKET --exclude server-save.zip') | crontab -"
 
 else
     echo "Factorio already installed. Skipping installation step."
@@ -271,7 +271,7 @@ sudo systemctl enable auto-shutdown
 sudo systemctl start auto-shutdown
 
 # Add cron job to run update and start-server at system startup
-CRON_JOB="@reboot sudo -u $FACTORIO_USER $TARGET_DIR/factorio-init/factorio update && sudo -u $FACTORIO_USER $TARGET_DIR/factorio-init/factorio start >> /var/log/factorio-update-start.log 2>&1"
+CRON_JOB="@reboot sudo -u $FACTORIO_USER $TARGET_DIR/factorio-init/factorio start >> /var/log/factorio-update-start.log 2>&1"
 
 # Check if the cron job already exists
 if ! sudo crontab -l | grep -q "$CRON_JOB"; then
